@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Glicemia Digital — Tecnologia no combate ao diabetes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f3f8ff; --surface:#ffffff; --ink:#0b2545; --muted:#46607f;
+  --blue:#1565d8; --blue-deep:#0b3d91; --blue-soft:#dbeaff; --line:#c9dcf5; --accent:#00a6c8;
+  --hero-a:#0b3d91; --hero-b:#1565d8; --on-hero:#ffffff;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#08162b; --surface:#0f2444; --ink:#e8f1ff; --muted:#9db6d8;
+    --blue:#5aa0ff; --blue-deep:#9cc6ff; --blue-soft:#12305c; --line:#1e3f70; --accent:#35d0ee;
+    --hero-a:#06142b; --hero-b:#0f3a7d; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#08162b; --surface:#0f2444; --ink:#e8f1ff; --muted:#9db6d8;
+  --blue:#5aa0ff; --blue-deep:#9cc6ff; --blue-soft:#12305c; --line:#1e3f70; --accent:#35d0ee;
+  --hero-a:#06142b; --hero-b:#0f3a7d; color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-behavior:smooth;scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Nunito Sans",system-ui,sans-serif;font-size:1.0625rem;line-height:1.65}
+h1,h2,h3{font-family:Fraunces,Georgia,serif;line-height:1.15;margin:0 0 .5em;letter-spacing:-.01em}
+p{margin:0 0 1em;max-width:62ch}
+a{color:var(--blue)}
+:focus-visible{outline:3px solid var(--accent);outline-offset:3px;border-radius:4px}
+.wrap{width:min(1080px,100% - 2.5rem);margin-inline:auto}
+
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--surface);border-bottom:1px solid var(--line)}
+header.top .wrap{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding-block:.75rem;flex-wrap:wrap}
+.brand{font-family:Fraunces,serif;font-weight:700;font-size:1.2rem;color:var(--blue-deep);text-decoration:none;display:flex;align-items:center;gap:.5rem}
+.drop{width:14px;height:20px;background:var(--blue);border-radius:50% 50% 50% 50%/65% 65% 35% 35%;display:inline-block}
+nav a{margin-left:1.1rem;text-decoration:none;color:var(--muted);font-weight:600;font-size:.95rem}
+nav a:hover{color:var(--blue)}
+
+.hero{background:linear-gradient(160deg,var(--hero-a),var(--hero-b));color:var(--on-hero);padding:clamp(3rem,9vw,6.5rem) 0 clamp(3rem,8vw,5.5rem)}
+.hero .wrap{display:grid;gap:2.5rem;grid-template-columns:1.25fr 1fr;align-items:center}
+.hero h1{font-size:clamp(2.2rem,5.5vw,3.8rem);margin-bottom:.45em}
+.hero p{font-size:1.15rem;opacity:.92}
+.btn{display:inline-block;background:#fff;color:#0b3d91;font-weight:700;padding:.8rem 1.4rem;border-radius:999px;text-decoration:none;margin-right:.6rem;margin-top:.4rem}
+.btn.ghost{background:transparent;color:#fff;border:2px solid rgba(255,255,255,.6)}
+
+/* acompanhamento da turma */
+.tools{display:flex;flex-wrap:wrap;gap:.8rem;align-items:end;margin:1.5rem 0 1rem}
+.tools label{font-weight:700;display:flex;flex-direction:column;gap:.25rem;font-size:.95rem}
+.tools input,#tab input{font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:.5rem .7rem;width:100%}
+.tools input{width:auto}
+.tools button{font:inherit;font-weight:700;cursor:pointer;border-radius:999px;padding:.55rem 1.1rem;border:2px solid var(--blue);background:transparent;color:var(--blue)}
+.tools button:hover{background:var(--blue-soft)}
+.tablewrap{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:16px}
+#tab{border-collapse:collapse;width:100%;min-width:560px}
+#tab th{text-align:left;padding:.8rem 1rem;background:var(--blue-soft);color:var(--blue-deep);font-size:.95rem}
+#tab td{padding:.5rem 1rem;border-top:1px solid var(--line)}
+#tab td:first-child{min-width:170px}
+#tab input.ok{background:rgba(40,180,110,.22)}
+#tab input.baixa{background:rgba(240,170,0,.28)}
+#tab input.alta{background:rgba(230,60,60,.24)}
+#tab .media{font-weight:700;white-space:nowrap}
+#tab .media small{display:block;font-weight:600;color:var(--muted)}
+.resumo{display:grid;gap:1rem;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));margin-top:1.2rem}
+.resumo .fact b{font-size:1.6rem}
+.legend{color:var(--muted);font-size:.93rem;margin-top:1rem}
+/* leitor de glicose: elemento memorável */
+.reader{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.28);border-radius:28px;padding:1.4rem 1.5rem;backdrop-filter:blur(6px)}
+.reader small{opacity:.8;font-weight:600}
+.reader .val{font-family:Fraunces,serif;font-size:4rem;line-height:1;font-weight:700}
+.reader .val span{font-size:1.1rem;font-family:"Nunito Sans",sans-serif;font-weight:600;margin-left:.3rem;opacity:.85}
+.reader svg{width:100%;height:90px;display:block;margin-top:.7rem}
+.range{display:flex;justify-content:space-between;font-size:.85rem;opacity:.85;margin-top:.3rem}
+.reader .ok{display:inline-block;background:rgba(53,208,238,.25);border-radius:999px;padding:.15rem .7rem;font-size:.85rem;font-weight:700;margin-top:.6rem}
+
+section{padding:clamp(3rem,7vw,5rem) 0}
+section h2{font-size:clamp(1.8rem,4vw,2.5rem)}
+.lead{color:var(--muted);font-size:1.12rem}
+
+.facts{display:grid;gap:1rem;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));margin-top:2rem}
+.fact{background:var(--surface);border-left:5px solid var(--blue);padding:1.1rem 1.3rem;border-radius:6px 14px 14px 6px}
+.fact b{display:block;font-family:Fraunces,serif;font-size:1.5rem;color:var(--blue)}
+.fact span{color:var(--muted);font-size:.97rem}
+
+.band{background:var(--blue-soft)}
+.tech{display:grid;gap:1.25rem;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));margin-top:2rem}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:1.5rem}
+.card:nth-child(1){grid-column:1/-1;display:grid;grid-template-columns:auto 1fr;gap:1.5rem;align-items:center;background:var(--blue-deep);color:#fff;border-color:transparent}
+.card:nth-child(1) p{color:#e1ecff}
+.card h3{font-size:1.3rem}
+.card p{color:var(--muted);margin:0}
+.ico{width:46px;height:46px;border-radius:14px;background:var(--blue-soft);display:grid;place-items:center;margin-bottom:.9rem}
+.card:nth-child(1) .ico{background:rgba(255,255,255,.16);margin:0;width:64px;height:64px}
+.ico svg{width:26px;height:26px;stroke:var(--blue);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.card:nth-child(1) .ico svg{stroke:#fff;width:34px;height:34px}
+.tag{display:inline-block;margin-top:.9rem;font-size:.85rem;font-weight:700;color:var(--blue);background:var(--blue-soft);padding:.2rem .7rem;border-radius:999px}
+.card:nth-child(1) .tag{background:rgba(255,255,255,.18);color:#fff}
+
+.steps{display:grid;gap:1rem;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));margin-top:2rem;counter-reset:s}
+.step{position:relative;padding:1.3rem 1.3rem 1.3rem 4rem;background:var(--surface);border:1px solid var(--line);border-radius:14px}
+.step::before{counter-increment:s;content:counter(s);position:absolute;left:1.1rem;top:1.2rem;width:2rem;height:2rem;border-radius:50%;background:var(--blue);color:#fff;display:grid;place-items:center;font-weight:700}
+.step h3{font-size:1.1rem;margin-bottom:.3em}
+.step p{margin:0;color:var(--muted);font-size:.98rem}
+
+.split{display:grid;gap:2rem;grid-template-columns:1fr 1fr;align-items:start}
+.pros li,.cons li{margin-bottom:.6rem}
+.box{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:1.5rem}
+.box h3{font-size:1.25rem}
+.box ul{padding-left:1.2rem;margin:0;color:var(--muted)}
+
+details{background:var(--surface);border:1px solid var(--line);border-radius:12px;margin-bottom:.8rem;padding:.2rem 1.2rem}
+summary{cursor:pointer;font-weight:700;padding:.9rem 0;list-style:none;display:flex;justify-content:space-between;gap:1rem}
+summary::after{content:"+";color:var(--blue);font-size:1.4rem;line-height:1}
+details[open] summary::after{content:"–"}
+details p{color:var(--muted)}
+
+.alert{background:var(--blue-soft);border-radius:16px;padding:1.3rem 1.5rem;border-left:6px solid var(--accent);margin-top:2rem}
+.alert p{margin:0;max-width:none}
+footer{background:var(--blue-deep);color:#e1ecff;padding:2.2rem 0;font-size:.95rem}
+footer p{max-width:70ch;margin:.3rem 0}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) footer{background:#06142b}}
+
+@media (max-width:820px){
+  .hero .wrap,.split{grid-template-columns:1fr}
+  .card:nth-child(1){grid-template-columns:1fr}
+  nav{display:none}
+}
+@media (prefers-reduced-motion:no-preference){
+  .line{stroke-dasharray:420;stroke-dashoffset:420;animation:draw 2.2s ease-out forwards}
+  @keyframes draw{to{stroke-dashoffset:0}}
+}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#inicio"><span class="drop" aria-hidden="true"></span>Glicemia Digital</a>
+    <nav aria-label="Principal">
+      <a href="#numeros">Panorama</a>
+      <a href="#tecnologias">Tecnologias</a>
+      <a href="#rotina">Na rotina</a>
+      <a href="#turma">Turma</a>
+      <a href="#cuidados">Cuidados</a>
+      <a href="#duvidas">Dúvidas</a>
+    </nav>
+  </div>
+</header>
+
+<main id="inicio">
+<div class="hero">
+  <div class="wrap">
+    <div>
+      <h1>A tecnologia está mudando o jeito de viver com diabetes</h1>
+      <p>Sensores que medem a glicose sem furar o dedo, bombas que ajustam a insulina e aplicativos que ajudam a prevenir a doença. Veja como cada ferramenta funciona.</p>
+      <a class="btn" href="#tecnologias">Conhecer as tecnologias</a>
+      <a class="btn ghost" href="#rotina">Usar na rotina</a>
+    </div>
+    <div class="reader" role="img" aria-label="Exemplo ilustrativo de um sensor de glicose mostrando valor estável dentro da faixa alvo">
+      <small>Exemplo ilustrativo · sensor contínuo</small>
+      <div class="val">112<span>mg/dL</span></div>
+      <svg viewBox="0 0 300 90" preserveAspectRatio="none" aria-hidden="true">
+        <rect x="0" y="22" width="300" height="40" fill="rgba(255,255,255,.12)"/>
+        <path class="line" d="M0 60 C25 50 40 30 65 38 S105 70 135 52 S180 22 210 36 S260 58 300 40" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round"/>
+      </svg>
+      <div class="range"><span>Últimas 3 horas</span><span>Faixa alvo: 70–180</span></div>
+      <span class="ok">Dentro da faixa</span>
+    </div>
+  </div>
+</div>
+
+<section id="numeros">
+  <div class="wrap">
+    <h2>Por que isso importa</h2>
+    <p class="lead">O diabetes é uma das doenças crônicas mais comuns do mundo. Controlar a glicose no dia a dia reduz o risco de complicações nos olhos, rins, nervos e coração.</p>
+    <div class="facts">
+      <div class="fact"><b>Mais de 500 milhões</b><span>de adultos vivem com diabetes no mundo, segundo a Federação Internacional de Diabetes.</span></div>
+      <div class="fact"><b>Tipo 2</b><span>é o mais frequente e, em muitos casos, pode ser prevenido ou retardado com hábitos saudáveis.</span></div>
+      <div class="fact"><b>Muitos sem diagnóstico</b><span>não sabem que têm a doença, por isso a triagem precoce faz diferença.</span></div>
+      <div class="fact"><b>Dados em tempo real</b><span>sensores e apps mostram como comida, sono e exercício afetam a glicose.</span></div>
+    </div>
+  </div>
+</section>
+
+<section id="tecnologias" class="band">
+  <div class="wrap">
+    <h2>Seis tecnologias que ajudam no controle</h2>
+    <p class="lead">Cada uma resolve um problema diferente. Muitas funcionam melhor juntas, com orientação da equipe de saúde.</p>
+    <div class="tech">
+      <article class="card">
+        <div class="ico"><svg viewBox="0 0 24 24"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg></div>
+        <div>
+          <h3>Monitoramento contínuo de glicose (CGM)</h3>
+          <p>Um pequeno sensor sob a pele mede a glicose a cada poucos minutos e envia os valores para o celular ou para um leitor. Ele mostra a tendência e pode emitir alarmes de hipoglicemia e hiperglicemia, o que reduz a necessidade de furar o dedo várias vezes ao dia.</p>
+          <span class="tag">Sensor · Alertas</span>
+        </div>
+      </article>
+      <article class="card">
+        <div class="ico"><svg viewBox="0 0 24 24"><rect x="6" y="3" width="12" height="18" rx="3"/><path d="M10 8h4M10 12h4M12 16v.01"/></svg></div>
+        <h3>Bombas de insulina</h3>
+        <p>Aplicam insulina de forma contínua por um cateter. Os sistemas mais novos, chamados de “pâncreas artificial”, se conectam ao sensor e ajustam as doses automaticamente.</p>
+        <span class="tag">Automação</span>
+      </article>
+      <article class="card">
+        <div class="ico"><svg viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/></svg></div>
+        <h3>Aplicativos de saúde</h3>
+        <p>Registram glicose, refeições, medicamentos e atividade física. Geram relatórios que facilitam a conversa na consulta e ajudam a notar padrões.</p>
+        <span class="tag">Registro · Relatórios</span>
+      </article>
+      <article class="card">
+        <div class="ico"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg></div>
+        <h3>Telemedicina</h3>
+        <p>Consultas por vídeo e envio remoto de dados aproximam o paciente do endocrinologista, algo valioso para quem mora longe de grandes centros.</p>
+        <span class="tag">Acesso</span>
+      </article>
+      <article class="card">
+        <div class="ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/></svg></div>
+        <h3>Inteligência artificial</h3>
+        <p>Analisa imagens da retina para detectar retinopatia diabética cedo e identifica pessoas com maior risco de desenvolver diabetes a partir de dados clínicos.</p>
+        <span class="tag">Diagnóstico precoce</span>
+      </article>
+      <article class="card">
+        <div class="ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="7"/><path d="M12 9v4l2 2M9 3h6"/></svg></div>
+        <h3>Wearables</h3>
+        <p>Relógios e pulseiras acompanham passos, sono e frequência cardíaca. Esses dados mostram como o estilo de vida influencia a glicose.</p>
+        <span class="tag">Hábitos</span>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section id="rotina">
+  <div class="wrap">
+    <h2>Como usar a tecnologia na rotina</h2>
+    <p class="lead">Uma sequência simples para começar com segurança.</p>
+    <div class="steps">
+      <div class="step"><h3>Converse com a equipe de saúde</h3><p>Médico, enfermeiro e nutricionista indicam o que faz sentido para o seu tipo de diabetes e tratamento.</p></div>
+      <div class="step"><h3>Escolha uma ferramenta</h3><p>Comece por uma só, como um app de registro ou um sensor, para não se sobrecarregar.</p></div>
+      <div class="step"><h3>Registre por duas semanas</h3><p>Anote refeições, atividade e sono junto com a glicose para enxergar padrões.</p></div>
+      <div class="step"><h3>Leve os dados à consulta</h3><p>Relatórios do sensor ou do app ajudam a ajustar o tratamento com precisão.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="cuidados" class="band">
+  <div class="wrap">
+    <h2>Vantagens e pontos de atenção</h2>
+    <div class="split" style="margin-top:1.5rem">
+      <div class="box">
+        <h3>O que a tecnologia oferece</h3>
+        <ul class="pros">
+          <li>Alertas antes de quedas e picos perigosos de glicose.</li>
+          <li>Menos picadas no dedo e mais dados ao longo do dia.</li>
+          <li>Decisões baseadas em tendências, não em medidas isoladas.</li>
+          <li>Acompanhamento à distância pela equipe de saúde ou por familiares.</li>
+        </ul>
+      </div>
+      <div class="box">
+        <h3>O que vale observar</h3>
+        <ul class="cons">
+          <li>Custo e acesso: nem todos os dispositivos estão disponíveis no sistema público.</li>
+          <li>Excesso de números pode gerar ansiedade; foque nas tendências.</li>
+          <li>Proteja seus dados de saúde e escolha apps confiáveis.</li>
+          <li>Nenhum aparelho substitui alimentação, atividade física e acompanhamento profissional.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="turma">
+  <div class="wrap">
+    <h2>Acompanhamento da turma</h2>
+    <p class="lead">Registre a glicemia de 10 alunos, de manhã e à noite. Escolha o dia, preencha os valores em mg/dL e tudo fica salvo neste navegador.</p>
+    <div class="tools">
+      <label for="dia">Dia<input type="date" id="dia"></label>
+      <button type="button" id="limpar">Limpar este dia</button>
+      <button type="button" id="limparTudo">Apagar tudo</button>
+    </div>
+    <div class="tablewrap">
+      <table id="tab">
+        <thead><tr><th>Aluno</th><th>Manhã (mg/dL)</th><th>Noite (mg/dL)</th><th>Média do dia</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <div class="resumo" id="resumo" aria-live="polite"></div>
+    <p class="legend">Cores de referência: amarelo abaixo de 70, verde de 70 a 180 e vermelho acima de 180 mg/dL. São faixas gerais e ilustrativas; as metas de cada aluno devem ser definidas pelo médico.</p>
+  </div>
+</section>
+
+<section id="duvidas">
+  <div class="wrap">
+    <h2>Perguntas frequentes</h2>
+    <details><summary>O sensor substitui totalmente o exame de dedo?</summary><p>Em muitos casos sim, mas alguns modelos pedem confirmação com glicemia capilar quando os sintomas não combinam com a leitura. Siga a orientação do fabricante e do seu médico.</p></details>
+    <details><summary>A tecnologia serve para diabetes tipo 2?</summary><p>Sim. Apps, wearables, telemedicina e, em certos casos, sensores contínuos ajudam também quem tem diabetes tipo 2 ou pré-diabetes a acompanhar a glicose e os hábitos.</p></details>
+    <details><summary>Existe tecnologia para prevenir o diabetes?</summary><p>Sim. Aplicativos de estilo de vida, programas digitais de emagrecimento e calculadoras de risco ajudam a identificar quem precisa de exames e a manter hábitos que reduzem o risco.</p></details>
+    <details><summary>Os aplicativos são seguros?</summary><p>Prefira apps de empresas conhecidas, leia a política de privacidade e confirme com a equipe de saúde antes de mudar qualquer dose de medicamento com base em um app.</p></details>
+    <div class="alert"><p><strong>Aviso:</strong> este site tem caráter informativo e não substitui consulta médica. Qualquer mudança no tratamento deve ser orientada por um profissional de saúde.</p></div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p><strong>Glicemia Digital</strong> · Projeto educativo sobre tecnologia e diabetes.</p>
+    <p>Site feito pelos alunos: Alice, Breno, Cecília, Henrique, João Gabriel, João Lucas, Renan, Téo, Valentyn e Yasmin.</p>
+    <p>Dados gerais baseados em informações de organizações como a Federação Internacional de Diabetes e a Sociedade Brasileira de Diabetes. Confirme sempre com seu médico.</p>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var KEY="glicemia-turma-v1", N=10, db={names:[],days:{}};
+  try{var r=localStorage.getItem(KEY); if(r){db=JSON.parse(r);}}catch(e){}
+  if(!db||typeof db!=="object"){db={names:[],days:{}};}
+  if(!db.names){db.names=[];} if(!db.days){db.days={};}
+  function save(){try{localStorage.setItem(KEY,JSON.stringify(db));}catch(e){}}
+  var dia=document.getElementById("dia"), body=document.querySelector("#tab tbody"), resumo=document.getElementById("resumo");
+  var d=new Date(), p=function(n){return (n<10?"0":"")+n;};
+  dia.value=d.getFullYear()+"-"+p(d.getMonth()+1)+"-"+p(d.getDate());
+
+  function cls(v){ if(v===""||v==null||isNaN(v)){return "";} v=+v; return v<70?"baixa":(v>180?"alta":"ok"); }
+  function txt(c){ return c==="baixa"?"Baixa":(c==="alta"?"Alta":(c==="ok"?"Na faixa":"")); }
+  function day(create){ var k=dia.value; if(!db.days[k]&&create){db.days[k]={};} return db.days[k]||{}; }
+
+  for(var i=0;i<N;i++){
+    var tr=document.createElement("tr");
+    tr.innerHTML='<td><input type="text" data-i="'+i+'" data-f="name" placeholder="Aluno '+(i+1)+'" aria-label="Nome do aluno '+(i+1)+'"></td>'+
+      '<td><input type="number" min="20" max="600" inputmode="numeric" data-i="'+i+'" data-f="m" aria-label="Glicemia da manhã do aluno '+(i+1)+'"></td>'+
+      '<td><input type="number" min="20" max="600" inputmode="numeric" data-i="'+i+'" data-f="n" aria-label="Glicemia da noite do aluno '+(i+1)+'"></td>'+
+      '<td class="media"></td>';
+    body.appendChild(tr);
+  }
+
+  function rowUpdate(i){
+    var tr=body.rows[i], m=tr.querySelector('[data-f="m"]'), n=tr.querySelector('[data-f="n"]');
+    m.className=cls(m.value); n.className=cls(n.value);
+    var vals=[m.value,n.value].filter(function(v){return v!=="";}).map(Number);
+    var cell=tr.querySelector(".media");
+    if(vals.length){
+      var avg=Math.round(vals.reduce(function(a,b){return a+b;},0)/vals.length);
+      cell.innerHTML=avg+' <small>'+txt(cls(avg))+'</small>';
+    } else { cell.textContent="—"; }
+  }
+
+  function summary(){
+    var all=[],low=0,high=0;
+    for(var i=0;i<N;i++){
+      ["m","n"].forEach(function(f){
+        var v=body.rows[i].querySelector('[data-f="'+f+'"]').value;
+        if(v!==""){ v=+v; all.push(v); if(v<70){low++;} if(v>180){high++;} }
+      });
+    }
+    var avg=all.length?Math.round(all.reduce(function(a,b){return a+b;},0)/all.length):"—";
+    resumo.innerHTML='<div class="fact"><b>'+all.length+' / '+(N*2)+'</b><span>medições registradas</span></div>'+
+      '<div class="fact"><b>'+avg+'</b><span>média da turma (mg/dL)</span></div>'+
+      '<div class="fact"><b>'+low+'</b><span>leituras abaixo de 70</span></div>'+
+      '<div class="fact"><b>'+high+'</b><span>leituras acima de 180</span></div>';
+  }
+
+  function render(){
+    var data=day(false);
+    for(var i=0;i<N;i++){
+      var tr=body.rows[i], rec=data[i]||{};
+      tr.querySelector('[data-f="name"]').value=db.names[i]||"";
+      tr.querySelector('[data-f="m"]').value=rec.m==null?"":rec.m;
+      tr.querySelector('[data-f="n"]').value=rec.n==null?"":rec.n;
+      rowUpdate(i);
+    }
+    summary();
+  }
+
+  body.addEventListener("input",function(e){
+    var t=e.target, i=+t.getAttribute("data-i"), f=t.getAttribute("data-f");
+    if(isNaN(i)||!f){return;}
+    if(f==="name"){ db.names[i]=t.value; }
+    else {
+      var rec=day(true); if(!rec[i]){rec[i]={}; }
+      rec[i][f]=t.value===""?null:Number(t.value);
+    }
+    save(); rowUpdate(i); summary();
+  });
+  dia.addEventListener("change",render);
+
+  function twoStep(btn,label,action){
+    var timer;
+    btn.addEventListener("click",function(){
+      if(btn.getAttribute("data-armed")){ clearTimeout(timer); btn.removeAttribute("data-armed"); btn.textContent=label; action(); return; }
+      btn.setAttribute("data-armed","1"); btn.textContent="Clique de novo para confirmar";
+      timer=setTimeout(function(){btn.removeAttribute("data-armed"); btn.textContent=label;},3500);
+    });
+  }
+  twoStep(document.getElementById("limpar"),"Limpar este dia",function(){ delete db.days[dia.value]; save(); render(); });
+  twoStep(document.getElementById("limparTudo"),"Apagar tudo",function(){ db={names:[],days:{}}; save(); render(); });
+
+  render();
+})();
+</script>
+</body>
+</html>
